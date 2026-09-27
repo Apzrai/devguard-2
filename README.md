@@ -308,8 +308,6 @@ The DEVGUARD backend exposes a FastAPI REST API. All pipeline phases are accessi
 python -m uvicorn api.main:app --reload --port 8000
 ```
 
-**Interactive docs:** [http://localhost:8000/docs](http://localhost:8000/docs)  
-**OpenAPI schema:** [http://localhost:8000/openapi.json](http://localhost:8000/openapi.json)
 
 ### Endpoints
 
@@ -427,8 +425,6 @@ pip install -r requirements.txt
 # Start the DEVGUARD API server
 python -m uvicorn api.main:app --reload --port 8000
 ```
-
-API docs available at: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ### Frontend
 
