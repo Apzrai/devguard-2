@@ -183,13 +183,14 @@ LOYALTY_DISCOUNT:    0.10 → 0.15   ✗ UNINTENDED
 
 DEVGUARD's drift detector flags the unintended change to a protected behavior.
 
-DEVGUARD's verifier applies the diff to an isolated working copy, runs the test suite, and the following tests fail:
+DEVGUARD's verifier applies the proposed diff to an isolated working copy and runs the test suite. It compares the candidate's failures against the baseline to distinguish expected failures caused by the requested Enterprise change from failures caused by unintended changes to protected behavior.
+
+The unintended Loyalty discount change produces a protected-behavior regression, including failure of the Loyalty discount verification:
 
 - `test_loyalty_discount_is_10_percent`
-- `test_loyalty_customer_rate`
-- `test_loyalty_customer_100_dollar_order_discount`
-- `test_loyalty_customer_10pct_discount`
-- `test_discount_rates_are_independent`
+
+DEVGUARD correlates the regression with the protected Loyalty behavior defined in the behavioral contract.
+
 
 **Result:**
 
