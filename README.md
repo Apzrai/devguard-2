@@ -16,7 +16,7 @@ and
 
 > "Did the AI unintentionally change behavior that was supposed to remain protected?"
 
-DEVGUARD answers the second question deterministically.
+DEVGUARD evaluates the second question using deterministic behavioral and verification checks.
 
 It establishes a behavioral baseline from the existing codebase, defines what is allowed to change, protects all other existing behaviors, detects unintended behavioral drift in the AI's output, runs deterministic verification against the behavioral contract, and produces a cryptographically-linked **Proof of Done**.
 
@@ -485,7 +485,7 @@ DEVGUARD does not claim to mathematically prove every possible behavior of arbit
 
 The strength of the behavioral contract depends on the completeness of the existing test suite. DEVGUARD cannot detect regressions for behaviors that have no corresponding tests.
 
-The intent drift detection and behavior map steps use watsonx.ai for analysis. The verification verdict (`PASS` / `FAIL`) is always determined deterministically by pytest results — not by the AI.
+The core DEVGUARD verification pipeline is deterministic. Repository understanding, behavioral mapping, evidence collection, contract evaluation, diff analysis, baseline comparison, and test-based verification are implemented in Python. Optional LLM-based execution backends exist in the architecture, but the demonstrated verification verdict does not depend on a generative AI model.
 
 ---
 
