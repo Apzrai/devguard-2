@@ -1,4 +1,10 @@
-export type EvidenceSource = "OBSERVED" | "DOCUMENTED" | "TESTED" | "INFERRED";
+const API_BASE_URL = "https://devguard-2.onrender.com";
+
+export type EvidenceSource =
+  | "OBSERVED"
+  | "DOCUMENTED"
+  | "TESTED"
+  | "INFERRED";
 
 export interface ProtectedBehavior {
   id: string;
@@ -71,74 +77,100 @@ export interface ProofOfDone {
   verificationSummary: string;
 }
 
-export const repositoryAnalysis: RepositoryAnalysis = {
-  repository: "LegacyShop",
-  label: "SAMPLE LEGACY REPOSITORY",
-  branch: "main",
-  commit: "4f9c1a2",
-  language: "Python",
-  testFramework: "pytest",
-  filesAnalyzed: 8,
-  testsDiscovered: 26,
-  behavioralRules: 14,
-  protectedBehaviors: 4,
-  evidenceSources: 18,
+const defaultMaintenance = {
+  description: "Update the Enterprise discount from 10% to 15%.",
+  target_behavior_id: "B003",
+  target_symbol: "ENTERPRISE_DISCOUNT",
+  target_file: "customers.py",
+  current_value: "0.10",
+  requested_value: "0.15",
+  requestor: "developer",
+  notes: "",
 };
 
-export const maintenanceRequest: MaintenanceRequest = {
-  id: "REQ-2026-041",
-  requestor: "mira.chen",
-  targetBehavior: "Enterprise discount",
-  requestedChange: "Change the Enterprise discount from 10% to 15%.",
-};
+async function request<T>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+  });
 
-export const behavioralContract: BehavioralContract = {
-  status: "CONTRACT ESTABLISHED",
-  allowedBehavior: "Enterprise discount",
-  from: "10%",
-  to: "15%",
-  protectedBehaviors: [
-    { id: "B002", title: "Loyalty discount", description: "Loyalty customers retain the existing 10% discount.", source: "TESTED" },
-    { id: "B006", title: "Tax calculation", description: "Tax is calculated after discount resolution.", source: "OBSERVED" },
-    { id: "B009", title: "Coupon ordering", description: "Coupons apply after customer-type discounts.", source: "DOCUMENTED" },
-    { id: "B011", title: "Refund calculation", description: "Refunds mirror the final checkout amount.", source: "TESTED" },
-  ],
-};
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `DEVGUARD API error ${response.status}: ${errorText}`,
+    );
+  }
 
-export const impactAnalysis: ImpactAnalysis = {
-  requestedSymbol: "ENTERPRISE_DISCOUNT",
-  expectedImpact: ["customers.py", "discount.py", "related tests"],
-  protectedDependencies: ["LOYALTY_DISCOUNT", "TAX", "COUPON ORDER", "REFUND CALCULATION"],
-};
+  return response.json() as Promise<T>;
+}
 
-export const driftResult: DriftResult = {
-  status: "blocked",
-  requested: "ENTERPRISE_DISCOUNT · 10% → 15%",
-  unexpected: "LOYALTY_DISCOUNT · 10% → 15%",
-  clause: "B002 — LOYALTY customer discount violated",
-  detail: "The requested Enterprise behavior changed, but a protected Loyalty behavior changed as well.",
-};
+export const devguardService = {
+  async getRepositoryAnalysis(): Promise<RepositoryAnalysis> {
+    return request<RepositoryAnalysis>("/api/repository/analyze", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+  },
 
-export const verificationResult: VerificationResult = {
-  status: "verified",
-  protectedBehaviorsPreserved: ["Loyalty discount", "Tax calculation", "Coupon ordering", "Refund calculation"],
-  correctedChange: "Enterprise discount · 10% → 15%",
-};
+  async getMaintenanceRequest(): Promise<MaintenanceRequest> {
+    return request<MaintenanceRequest>("/api/maintenance", {
+      method: "POST",
+      body: JSON.stringify(defaultMaintenance),
+    });
+  },
 
-export const proofOfDone: ProofOfDone = {
-  status: "verified",
-  request: maintenanceRequest,
-  filesChanged: ["discount.py", "tests/test_discount.py"],
-  testResults: "26 tests passed · baseline preserved",
-  verificationSummary: "Corrected execution satisfied the behavioral contract with no protected behavior drift.",
-};
+  async getBehavioralContract(): Promise<BehavioralContract> {
+    return request<BehavioralContract>("/api/contract", {
+      method: "POST",
+      body: JSON.stringify({
+        maintenance: defaultMaintenance,
+      }),
+    });
+  },
 
-export const demoService = {
-  getRepositoryAnalysis: async () => repositoryAnalysis,
-  getMaintenanceRequest: async () => maintenanceRequest,
-  getBehavioralContract: async () => behavioralContract,
-  getImpactAnalysis: async () => impactAnalysis,
-  getDriftResult: async () => driftResult,
-  getVerificationResult: async () => verificationResult,
-  getProofOfDone: async () => proofOfDone,
+  async getImpactAnalysis(): Promise<ImpactAnalysis> {
+    return request<ImpactAnalysis>("/api/impact", {
+      method: "POST",
+      body: JSON.stringify({
+        maintenance: defaultMaintenance,
+      }),
+    });
+  },
+
+  async getDriftResult(): Promise<DriftResult> {
+    return request<DriftResult>("/api/drift", {
+      method: "POST",
+      body: JSON.stringify({
+        maintenance: defaultMaintenance,
+        bob_backend: "mock",
+        bob_scenario: "failure",
+      }),
+    });
+  },
+
+  async getVerificationResult(): Promise<VerificationResult> {
+    return request<VerificationResult>("/api/verify", {
+      method: "POST",
+      body: JSON.stringify({
+        maintenance: defaultMaintenance,
+        bob_backend: "mock",
+        bob_scenario: "success",
+      }),
+    });
+  },
+
+  async getProofOfDone(): Promise<ProofOfDone> {
+    return request<ProofOfDone>(
+      "/api/proof?bob_backend=mock&bob_scenario=success",
+      {
+        method: "GET",
+      },
+    );
+  },
 };
