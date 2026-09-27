@@ -1,6 +1,13 @@
-# DEVGUARD 2.0
+# DEVGUARD 2.0 - **Behavioral Safety for AI-Assisted Software Maintenance**
 
-**Behavioral Safety for AI-Assisted Software Maintenance**
+**Let AI change the code. Make behavior accountable.**
+
+DEVGUARD 2.0 is a behavioral safety and verification control plane for
+AI-assisted software maintenance.
+
+It establishes a behavioral baseline, defines what is allowed to change,
+protects existing behavior, detects unintended behavioral drift, verifies
+the resulting change, and produces an evidence-backed Proof of Done.
 
 ---
 
@@ -81,7 +88,7 @@ Code Change / Diff
     │                    → maps test failures to violated contract clauses
     ▼
 [ proof.py ]             Proof of Done
-                         → SHA-256 hash chain across all artifacts
+                         → SHA-256 provenance across relevant artifacts
                          → VERIFIED or BLOCKED final status
 ```
 
@@ -466,7 +473,7 @@ Set `BOB_BACKEND=mock` to run the full demonstration without any external API ke
 - Intent drift detection
 - Deterministic verification (pytest-based, isolated working copy)
 - Proof of Done with SHA-256 hash chain
-- FastAPI REST API (9 endpoints)
+- FastAPI REST API with 9 DEVGUARD API endpoints, plus interactive Swagger/OpenAPI documentation.
 - React/TypeScript frontend
 
 ### Potential Future Work
@@ -490,4 +497,3 @@ The core DEVGUARD verification pipeline is deterministic. Repository understandi
 
 ---
 
-*Let AI change the code. Make behavior accountable.*
