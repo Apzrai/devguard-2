@@ -65,7 +65,7 @@ Maintenance Request
 [ bob_task.py ]          BobTask Assembly
     │                    → structured handoff package for the coding agent
     ▼
-AI Coding Agent (IBM Bob / mock / other)
+AI Coding Agent (IBM Bob in the demonstrated workflow)
     │
     ▼
 Code Change / Diff
